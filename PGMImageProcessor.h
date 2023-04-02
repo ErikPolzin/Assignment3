@@ -19,6 +19,11 @@ class PGMImageProcessor {
 
     public:
         PGMImageProcessor(const PGMMetadata &md);
+        ~PGMImageProcessor();
+        PGMImageProcessor(const PGMImageProcessor &p);
+        PGMImageProcessor(PGMImageProcessor &&p);
+        PGMImageProcessor& operator=(const PGMImageProcessor& rhs);
+        PGMImageProcessor& operator=(PGMImageProcessor&& rhs);
         int extractComponents(int threshold, int minValidSize);
         int filterComponentsBySize(int minSize, int maxSize);
         bool writeComponents(const std::string & outFileName);

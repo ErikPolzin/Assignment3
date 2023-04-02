@@ -15,6 +15,66 @@ PGMImageProcessor::PGMImageProcessor(const PGMMetadata &md): mdata(md)
     }
 }
 
+PGMImageProcessor::~PGMImageProcessor()
+{
+    if (data == nullptr) return;
+    for (int i = 0; i < mdata.height; ++i) delete [] data[i];
+    delete [] data;
+}
+
+PGMImageProcessor::PGMImageProcessor(const PGMImageProcessor &p)
+{
+    mdata = PGMMetadata(p.mdata);
+    data = new std::tuple<unsigned char, bool>*[mdata.height];
+    for (int i = 0; i < mdata.height; ++i) {
+        data[i] = new std::tuple<unsigned char, bool>(*p.data[i]);
+    }
+}
+
+PGMImageProcessor::PGMImageProcessor(PGMImageProcessor &&p)
+{
+    mdata = PGMMetadata(p.mdata);
+    data = p.data;
+    p.data = nullptr;
+    components = std::move(p.components);
+}
+
+PGMImageProcessor &PGMImageProcessor::operator=(const PGMImageProcessor &rhs)
+{
+    if (this != &rhs) {
+        mdata = PGMMetadata(rhs.mdata);
+        if (data != nullptr)
+        {
+            for (int i = 0; i < mdata.height; ++i) delete [] data[i];
+            delete [] data;
+        }
+        if (rhs.data != nullptr) {
+            data = new std::tuple<unsigned char, bool>*[mdata.height];
+            for (int i = 0; i < mdata.height; ++i) {
+                data[i] = new std::tuple<unsigned char, bool>(*rhs.data[i]);
+            }
+        };
+    }
+    return *this;
+}
+
+PGMImageProcessor &PGMImageProcessor::operator=(PGMImageProcessor &&rhs)
+{
+    if (this != &rhs) {
+        mdata = PGMMetadata(rhs.mdata);
+        if (data != nullptr) {
+            for (int i = 0; i < mdata.height; ++i) delete [] data[i];
+            delete [] data;
+        }
+        if (rhs.data != nullptr) {
+            data = rhs.data;
+            rhs.data = nullptr;
+        };
+        components = std::move(rhs.components);
+    }
+    return *this;
+}
+
 int PGMImageProcessor::extractComponents(int threshold, int minValidSize)
 {
     if (data == nullptr) return -1;
