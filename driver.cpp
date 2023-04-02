@@ -51,7 +51,6 @@ int main(int argc, char* argv[])
     int ncomponents = processor.extractComponents(threshold, minValidSize, maxValidSize);
     auto t2 = std::chrono::high_resolution_clock::now();
     auto ms_int = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1);
-    std::cout << "Extracted " << ncomponents << " connected areas." << std::endl;
     std::cout << "Extracted completed in " << ms_int.count() << "ms\n";
     if (!outFileName.empty()) processor.writeComponents(outFileName);
     if (printComponents) processor.printComponents();

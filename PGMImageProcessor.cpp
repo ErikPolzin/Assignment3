@@ -171,6 +171,8 @@ void PGMImageProcessor::printComponentData(const ConnectedComponent &c) const
 void PGMImageProcessor::printComponents(void) const
 {
     for (ConnectedComponent c: components) printComponentData(c);
+    std::cout << "Extracted " << getComponentCount() << " connected areas." << std::endl;
+    std::cout << "Smallest: " << getSmallestSize() << " Largest: " << getLargestSize() << std::endl;
 }
 
 std::multiset<ConnectedComponent>::const_iterator PGMImageProcessor::begin()
