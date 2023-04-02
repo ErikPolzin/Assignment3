@@ -28,7 +28,7 @@ class ConnectedComponent {
         int getSize() const;
         /// @brief Get the number of boundary pixels in this component
         /// @return number of boundary pixels
-        int getBoundarySize();
+        int getBoundarySize() const;
         /// @brief Compare this component to another
         /// @param other other component
         /// @return Comparison based on the number of interior pixels

@@ -24,6 +24,8 @@ class PGMImageProcessor {
         PGMImageProcessor(PGMImageProcessor &&p);
         PGMImageProcessor& operator=(const PGMImageProcessor& rhs); // Copy Assignment Operator
         PGMImageProcessor& operator=(PGMImageProcessor&& rhs); // Move Assignment Operator
+        /* extract components with no minimum valid size */
+        int extractComponents(int threshold);
         /* Process the input image to extract all the connected components,
         based on the supplied threshold (0...255) and excluding any components
         of less than the minValidSize. The final number of components that
@@ -36,6 +38,7 @@ class PGMImageProcessor {
         obey the size criteria pass as arguments. The number remaining
         after this operation is returned.
         */
+        int extractComponents(int threshold, int minValidSize, int maxValidSize);
         int filterComponentsBySize(int minSize, int maxSize);
         /* Create a new PGM file which contains all current components
         (255=component pixel, 0 otherwise) and write this to outFileName as a
@@ -55,6 +58,8 @@ class PGMImageProcessor {
         void printComponentData(const ConnectedComponent & theComponent) const;
         /* Print all components */
         void printComponents(void) const;
+        std::multiset<ConnectedComponent>::const_iterator begin();
+        std::multiset<ConnectedComponent>::const_iterator end();
         /* Read image data from a file stream */
         friend std::istream& operator>>(std::istream& stream, PGMImageProcessor& processor);
 };

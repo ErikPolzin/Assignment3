@@ -81,7 +81,17 @@ PGMImageProcessor &PGMImageProcessor::operator=(PGMImageProcessor &&rhs)
     return *this;
 }
 
+int PGMImageProcessor::extractComponents(int threshold)
+{
+    extractComponents(threshold, -1);
+}
+
 int PGMImageProcessor::extractComponents(int threshold, int minValidSize)
+{
+    extractComponents(threshold, minValidSize, std::numeric_limits<int>::max());
+}
+
+int PGMImageProcessor::extractComponents(int threshold, int minValidSize, int maxValidSize)
 {
     if (data == nullptr) return -1;
     int width = mdata.width; int height = mdata.height;
@@ -92,7 +102,7 @@ int PGMImageProcessor::extractComponents(int threshold, int minValidSize)
             if (std::get<0>(data[y][x]) > threshold) {
                 ConnectedComponent component(mdata.width, mdata.height, data);
                 component.seedAt(x, y, threshold);
-                if (component.getSize() > minValidSize) {
+                if (component.getSize() > minValidSize && component.getSize() < maxValidSize) {
                     components.insert(component);
                 }
             // else if not VISITED
@@ -161,6 +171,16 @@ void PGMImageProcessor::printComponentData(const ConnectedComponent &c) const
 void PGMImageProcessor::printComponents(void) const
 {
     for (ConnectedComponent c: components) printComponentData(c);
+}
+
+std::multiset<ConnectedComponent>::const_iterator PGMImageProcessor::begin()
+{
+    return components.begin();
+}
+
+std::multiset<ConnectedComponent>::const_iterator PGMImageProcessor::end()
+{
+    return components.end();
 }
 
 std::istream &operator>>(std::istream &stream, PGMImageProcessor &processor)

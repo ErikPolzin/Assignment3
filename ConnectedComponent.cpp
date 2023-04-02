@@ -23,7 +23,10 @@ void ConnectedComponent::seedAt(int x, int y, int threshold) {
         coords = s.top();
         x = coords[0]; y = coords[1];
         s.pop();
-        if (!INBOUNDS(x, y)) continue;
+        if (!INBOUNDS(x, y)) {
+            ++boundarysize;
+            continue;
+        };
         if (INSIDE(x, y)) {
             SET(x, y, 255);
             s.push({x-1, y});
@@ -32,14 +35,15 @@ void ConnectedComponent::seedAt(int x, int y, int threshold) {
             s.push({x, y+1});
             ++size;
         } else if (!VISITED(x, y)) {
-            SET(x, y, 100);
+            // Sets a slightly different color for the boundary, not necessary for this assignment
+            // SET(x, y, 100);
             ++boundarysize;
         }
     }
 }
 
 int ConnectedComponent::getSize() const {return size;}
-int ConnectedComponent::getBoundarySize() {return boundarysize;}
+int ConnectedComponent::getBoundarySize() const {return boundarysize;}
 bool ConnectedComponent::operator<(const ConnectedComponent &other) const
 {
     if (size < other.size) return true;
