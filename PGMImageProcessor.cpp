@@ -9,6 +9,7 @@
 namespace PLZERI001{
 PGMImageProcessor::PGMImageProcessor(const PGMMetadata &md): mdata(md)
 {
+    // Dynamically allocate memory from the heap
     data = new std::tuple<unsigned char, bool>*[mdata.height];
     for (int i = 0; i < mdata.height; ++i) {
         data[i] = new std::tuple<unsigned char, bool>[mdata.width];
@@ -25,6 +26,7 @@ PGMImageProcessor::~PGMImageProcessor()
 PGMImageProcessor::PGMImageProcessor(const PGMImageProcessor &p)
 {
     mdata = PGMMetadata(p.mdata);
+    // Copy new data on the heap
     data = new std::tuple<unsigned char, bool>*[mdata.height];
     for (int i = 0; i < mdata.height; ++i) {
         data[i] = new std::tuple<unsigned char, bool>(*p.data[i]);
@@ -34,7 +36,7 @@ PGMImageProcessor::PGMImageProcessor(const PGMImageProcessor &p)
 PGMImageProcessor::PGMImageProcessor(PGMImageProcessor &&p)
 {
     mdata = PGMMetadata(p.mdata);
-    data = p.data;
+    data = p.data;  // Steal p's pixel data
     p.data = nullptr;
     components = std::move(p.components);
 }
@@ -43,11 +45,13 @@ PGMImageProcessor &PGMImageProcessor::operator=(const PGMImageProcessor &rhs)
 {
     if (this != &rhs) {
         mdata = PGMMetadata(rhs.mdata);
+        // Clear the previously set data, if applicable
         if (data != nullptr)
         {
             for (int i = 0; i < mdata.height; ++i) delete [] data[i];
             delete [] data;
         }
+        // Copy new data
         if (rhs.data != nullptr) {
             data = new std::tuple<unsigned char, bool>*[mdata.height];
             for (int i = 0; i < mdata.height; ++i) {
@@ -62,10 +66,12 @@ PGMImageProcessor &PGMImageProcessor::operator=(PGMImageProcessor &&rhs)
 {
     if (this != &rhs) {
         mdata = PGMMetadata(rhs.mdata);
+        // Clear the previously set data, if applicable
         if (data != nullptr) {
             for (int i = 0; i < mdata.height; ++i) delete [] data[i];
             delete [] data;
         }
+        // Steal moveable processor's pixels
         if (rhs.data != nullptr) {
             data = rhs.data;
             rhs.data = nullptr;
@@ -81,6 +87,7 @@ int PGMImageProcessor::extractComponents(int threshold, int minValidSize)
     int width = mdata.width; int height = mdata.height;
     for (int y = 0; y < mdata.height; ++y) {
         for (int x = 0; x < mdata.width; ++x) {
+            // Continue if visited
             if (std::get<1>(data[y][x])) continue;
             if (std::get<0>(data[y][x]) > threshold) {
                 ConnectedComponent component(mdata.width, mdata.height, data);
@@ -88,7 +95,9 @@ int PGMImageProcessor::extractComponents(int threshold, int minValidSize)
                 if (component.getSize() > minValidSize) {
                     components.insert(component);
                 }
+            // else if not VISITED
             } else {
+                // Set to background
                 std::get<0>(data[y][x]) = 0;
             }
         }
